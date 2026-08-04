@@ -100,8 +100,19 @@
     border-color: rgba(255,60,70,0.14);
     animation: ringIn 1.2s ease-out 1.6s forwards, ringSpin 60s linear reverse 1.6s infinite;
   }
+  .ring.accent{
+    width:min(88vw, 440px);
+    height:min(88vw, 440px);
+    top:-2%;
+    border-style:solid;
+    border-width:1px;
+    border-color: rgba(255,40,50,0.16);
+    box-shadow: 0 0 24px 2px rgba(255,30,40,0.12) inset;
+    animation: ringIn 1.2s ease-out 1.9s forwards, ringSpin 75s linear 1.9s infinite, ringPulse 3.6s ease-in-out 2.6s infinite;
+  }
   @keyframes ringIn{ from{ opacity:0; } to{ opacity:1; } }
   @keyframes ringSpin{ from{ transform:translateX(-50%) rotate(0deg); } to{ transform:translateX(-50%) rotate(360deg); } }
+  @keyframes ringPulse{ 0%,100%{ border-color: rgba(255,40,50,0.10); } 50%{ border-color: rgba(255,60,70,0.32); } }
 
   /* subtle grain texture for a premium finish */
   .grain{
@@ -249,16 +260,90 @@
   /* ---------- content ---------- */
   .content{
     position:absolute;
-    top:calc(46% + 20px);
+    top:calc(46% + 14px);
     left:0;
     width:100%;
     display:flex;
     flex-direction:column;
     align-items:center;
-    text-align:center;
-    padding:0 8vw;
     z-index:4;
   }
+
+  /* glass panel — water-like frosted card */
+  @property --angle{
+    syntax:'<angle>';
+    inherits:false;
+    initial-value:0deg;
+  }
+
+  .glass-panel{
+    position:relative;
+    width:100%;
+    text-align:center;
+    padding: 24px 8vw 16px;
+    border-radius: 30px 30px 0 0;
+    background: linear-gradient(180deg, rgba(35,10,10,0.42), rgba(10,3,3,0.68));
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    overflow:hidden;
+    isolation:isolate;
+    opacity:0;
+    animation: panelIn 1.1s ease-out 1.7s forwards;
+  }
+
+  @keyframes panelIn{ from{ opacity:0; } to{ opacity:1; } }
+
+  .glass-panel::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    padding:1.4px;
+    background: conic-gradient(from var(--angle,0deg),
+      rgba(255,40,50,0.95),
+      rgba(255,255,255,0.55) 15%,
+      rgba(255,40,50,0.15) 35%,
+      rgba(255,40,50,0.85) 60%,
+      rgba(255,255,255,0.4) 78%,
+      rgba(255,40,50,0.95));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: rotateAngle 5s linear infinite;
+    pointer-events:none;
+    z-index:2;
+  }
+
+  @keyframes rotateAngle{ to{ --angle:360deg; } }
+
+  /* diagonal shimmer sweep — glass / water reflection */
+  .glass-panel::after{
+    content:"";
+    position:absolute;
+    top:-60%;
+    left:-60%;
+    width:55%;
+    height:220%;
+    background: linear-gradient(115deg,
+      transparent 30%,
+      rgba(255,255,255,0.10) 46%,
+      rgba(255,255,255,0.22) 50%,
+      rgba(255,255,255,0.10) 54%,
+      transparent 70%);
+    transform: rotate(6deg);
+    animation: shimmerSweep 5.5s ease-in-out infinite;
+    animation-delay: 4.6s;
+    pointer-events:none;
+    z-index:2;
+  }
+
+  @keyframes shimmerSweep{
+    0%   { left:-60%; }
+    28%  { left:130%; }
+    100% { left:130%; }
+  }
+
+  .glass-panel > *{ position:relative; z-index:3; }
 
   h1{
     font-weight:800;
@@ -326,6 +411,27 @@
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     transition: transform .25s ease;
+    overflow:hidden;
+  }
+
+  .btn::before{
+    content:"";
+    position:absolute;
+    top:0; left:-70%;
+    width:40%; height:100%;
+    background: linear-gradient(115deg, transparent, rgba(255,255,255,0.35), transparent);
+    transform: skewX(-20deg);
+    animation: btnShine 4.5s ease-in-out infinite;
+    pointer-events:none;
+  }
+
+  .btn-primary::before{ animation-delay: 3.8s; }
+  .btn-ghost::before{ animation-delay: 4.3s; }
+
+  @keyframes btnShine{
+    0%   { left:-70%; }
+    22%  { left:130%; }
+    100% { left:130%; }
   }
 
   .btn:active{ transform: scale(0.96); }
@@ -423,6 +529,39 @@
     background:linear-gradient(180deg, transparent, rgba(255,60,70,0.3), transparent);
   }
 
+  /* footer contact row */
+  .footer{
+    position:absolute;
+    bottom:3.5%;
+    left:0;
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:22px;
+    z-index:4;
+    opacity:0;
+    animation: fadeUp .9s ease-out 4.5s forwards;
+  }
+
+  .footer a{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    border:1px solid rgba(255,80,90,0.22);
+    background:rgba(15,6,6,0.4);
+    color:rgba(230,220,216,0.7);
+    text-decoration:none;
+    transition: transform .2s ease, border-color .2s ease;
+  }
+
+  .footer a:active{ transform:scale(0.92); }
+
+  .footer svg{ width:15px; height:15px; }
+
   /* glow pulses emanating toward center, from both sides */
   .actions::before, .actions::after{
     content:"";
@@ -490,10 +629,10 @@
 
   <div class="ring"></div>
   <div class="ring small"></div>
+  <div class="ring accent"></div>
 
   <div class="portrait-wrap">
-    <img class="portrait" src="teacher.png" alt="Вчитель англійської">
-  </div>
+    <img class="portrait" src="data:image/png;base64,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  </div>
 
   <div class="badge"><span class="dot"></span>На зв'язку онлайн</div>
   <div class="badge lang">🇬🇧 Native-level English</div>
@@ -501,6 +640,7 @@
   <div class="divider-row"><div class="divider"></div></div>
 
   <div class="content">
+   <div class="glass-panel">
     <h1><span class="line1">Вчитель</span><span class="line2">Англійської</span></h1>
     <p class="subtitle">Допомагаю заговорити англійською впевнено та легко</p>
     <div class="actions">
@@ -530,6 +670,20 @@
         <span>Заняття онлайн</span>
       </div>
     </div>
+   </div>
+  </div>
+
+
+  <div class="footer">
+    <a href="#" aria-label="Telegram">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 3.5c.3-1-.5-1.7-1.4-1.3L2.3 9.8c-1 .4-1 1.2-.1 1.5l4.6 1.4 1.8 5.6c.2.7 1 .9 1.5.4l2.5-2.4 4.7 3.5c.7.5 1.5.2 1.7-.7l3-15.6zM8.4 12.4l9.3-5.8c.4-.3.8.1.4.4l-7.6 6.9-.3 3.2-1.4-3.3z"></path></svg>
+    </a>
+    <a href="#" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.2" cy="6.8" r="1"></circle></svg>
+    </a>
+    <a href="#" aria-label="Email">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2.5"></rect><path d="m3 6 9 7 9-7"></path></svg>
+    </a>
   </div>
 </div>
 
@@ -540,8 +694,8 @@
   var W, H, dpr;
   var particles = [];
   var orbs = [];
-  var COUNT = 95;
-  var ORB_COUNT = 6;
+  var COUNT = 140;
+  var ORB_COUNT = 9;
 
   function resize(){
     dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -636,4 +790,4 @@
 </script>
 
 </body>
-</html>
+                                 </html>
